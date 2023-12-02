@@ -3,6 +3,8 @@ package com.kostpost.banksystemspringpsql;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ConfigurableApplicationContext;
+
+import java.util.Objects;
 import java.util.Scanner;
 
 import com.kostpost.banksystemspringpsql.bankData.bankAccount;
@@ -24,7 +26,56 @@ public class BankSystemSpringPsqlApplication {
 
 				case "1": {
 					Scanner findAccount = new Scanner(System.in);
-					System.out.println("qwe");
+					String actionToAccount = null;
+					do {
+
+						Scanner askDataToFind = new Scanner(System.in);
+
+						System.out.println("1 - See all account\n2 - Find by ID\n3 - Find by Account Name\n4 - Exit");
+						actionToAccount = findAccount.nextLine();
+						switch (actionToAccount) {
+							case "1": {
+								controller.PrintBank(controller.FindAllBankAccounts());
+								break;
+							}
+
+							case "2": {
+								System.out.print("Enter a ID to find: ");
+								int idToFind = askDataToFind.nextInt();
+
+								bankAccount findID = controller.BankFindByID(idToFind);
+
+								if(findID != null){
+									controller.PrintBank(findID);
+								}else{
+									System.out.println("Account with ID: '" + idToFind + "' doesn't exist");
+								}
+
+								break;
+							}
+
+							case "3": {
+
+								System.out.println("Enter a name to find");
+								String nameToFind = askDataToFind.nextLine();
+
+								bankAccount accToFind = controller.findByAccountName(nameToFind);
+
+								if(accToFind != null){
+									controller.PrintBank(accToFind);
+								}else{
+									System.out.println("Account with Name: '" + nameToFind + "' doesn't exist");
+								}
+
+								break;
+							}
+
+							default:{
+								System.out.println("Error");
+							}
+						}
+
+					}while (!Objects.equals(actionToAccount, "4"));
 
 
 					break;
