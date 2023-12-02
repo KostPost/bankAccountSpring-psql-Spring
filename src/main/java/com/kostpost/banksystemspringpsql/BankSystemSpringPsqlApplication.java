@@ -19,7 +19,11 @@ public class BankSystemSpringPsqlApplication {
 		Scanner askAction = new Scanner(System.in);
 		String doAction;
 		do{
-			System.out.println("1 - Check accounts || Find account\n2 - Create account");
+			System.out.println("""
+                    1 - Check accounts || Find account
+                    2 - Create account
+                    3 - Log in
+                    4 - Exit""");
 			doAction = askAction.nextLine();
 
 			switch (doAction){
@@ -35,7 +39,9 @@ public class BankSystemSpringPsqlApplication {
 						actionToAccount = findAccount.nextLine();
 						switch (actionToAccount) {
 							case "1": {
+								System.out.println();
 								controller.PrintBank(controller.FindAllBankAccounts());
+								System.out.println();
 								break;
 							}
 
@@ -46,7 +52,10 @@ public class BankSystemSpringPsqlApplication {
 								bankAccount findID = controller.BankFindByID(idToFind);
 
 								if(findID != null){
+									System.out.println();
+									System.out.println("\nYour account: ");
 									controller.PrintBank(findID);
+									System.out.println();
 								}else{
 									System.out.println("Account with ID: '" + idToFind + "' doesn't exist");
 								}
@@ -62,7 +71,10 @@ public class BankSystemSpringPsqlApplication {
 								bankAccount accToFind = controller.findByAccountName(nameToFind);
 
 								if(accToFind != null){
+									System.out.println();
+									System.out.println("\nYour account: ");
 									controller.PrintBank(accToFind);
+									System.out.println();
 								}else{
 									System.out.println("Account with Name: '" + nameToFind + "' doesn't exist");
 								}
@@ -71,7 +83,9 @@ public class BankSystemSpringPsqlApplication {
 							}
 
 							default:{
-								System.out.println("Error");
+								if(!actionToAccount.equals("4")) {
+									System.out.println("Error");
+								}
 							}
 						}
 
@@ -108,6 +122,12 @@ public class BankSystemSpringPsqlApplication {
 
 				}
 
+				case "3":{
+
+
+
+				}
+
 				default:{
 
 				}
@@ -116,7 +136,7 @@ public class BankSystemSpringPsqlApplication {
 
 
 
-		}while (!doAction.equals("6"));
+		}while (!doAction.equals("4"));
 
 		context.close();
 		SpringApplication.run(BankSystemSpringPsqlApplication.class, args);
