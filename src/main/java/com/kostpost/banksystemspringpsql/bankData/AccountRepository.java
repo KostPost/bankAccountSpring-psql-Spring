@@ -1,9 +1,12 @@
 package com.kostpost.banksystemspringpsql.bankData;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Repository
-public interface bankAccountRepository extends JpaRepository<bankAccount, Integer> {
-    bankAccount findByAccountName(String AccName);
+public interface AccountRepository extends JpaRepository<Account, Long> {
+
 }

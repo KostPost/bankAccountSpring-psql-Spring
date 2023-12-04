@@ -1,13 +1,19 @@
 package com.kostpost.banksystemspringpsql;
 
+import com.kostpost.banksystemspringpsql.bankData.UserAccount;
+import org.hibernate.boot.model.process.internal.UserTypeResolution;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ConfigurableApplicationContext;
 
+import java.util.HashSet;
 import java.util.Objects;
 import java.util.Scanner;
+import java.util.Set;
 
-import com.kostpost.banksystemspringpsql.bankData.bankAccount;
+import com.kostpost.banksystemspringpsql.bankData.Account;
+import com.kostpost.banksystemspringpsql.bankData.UserAccount;
+import com.kostpost.banksystemspringpsql.bankData.AdminAccount;
 
 @SpringBootApplication
 public class BankSystemSpringPsqlApplication {
@@ -18,93 +24,103 @@ public class BankSystemSpringPsqlApplication {
 
 		Scanner askAction = new Scanner(System.in);
 		String doAction;
+
 		do{
 			System.out.println("""
-                    1 - Check accounts || Find account
-                    2 - Create account
-                    3 - Log in
-                    4 - Exit""");
+					1 - Login to account
+					2 - Create account
+					3 - Exit""");
 			doAction = askAction.nextLine();
-
+			
 			switch (doAction){
 
-				case "1": {
-					Scanner findAccount = new Scanner(System.in);
-					String actionToAccount = null;
-					do {
+				case "1":{
 
-						Scanner askDataToFind = new Scanner(System.in);
+					Scanner askData = new Scanner(System.in);
+					String LogName;
 
-						System.out.println("1 - See all account\n2 - Find by ID\n3 - Find by Account Name\n4 - Exit");
-						actionToAccount = findAccount.nextLine();
-						switch (actionToAccount) {
-							case "1": {
-								System.out.println();
-								controller.PrintBank(controller.FindAllBankAccounts());
-								System.out.println();
-								break;
-							}
+					UserAccount checkUser = null;
+					AdminAccount checkAdmin = null;
+					String kindAccount;
 
-							case "2": {
-								System.out.print("Enter a ID to find: ");
-								int idToFind = askDataToFind.nextInt();
+					do{
 
-								bankAccount findID = controller.BankFindByID(idToFind);
+						System.out.println("Enter a name");
+						LogName = askData.nextLine();
 
-								if(findID != null){
-									System.out.println();
-									System.out.println("\nYour account: ");
-									controller.PrintBank(findID);
-									System.out.println();
-								}else{
-									System.out.println("Account with ID: '" + idToFind + "' doesn't exist");
-								}
+						checkUser = controller.findUserByName(LogName);
+						checkAdmin = controller.findAdminByName(LogName);
 
-								break;
-							}
-
-							case "3": {
-
-								System.out.println("Enter a name to find");
-								String nameToFind = askDataToFind.nextLine();
-
-								bankAccount accToFind = controller.findByAccountName(nameToFind);
-
-								if(accToFind != null){
-									System.out.println();
-									System.out.println("\nYour account: ");
-									controller.PrintBank(accToFind);
-									System.out.println();
-								}else{
-									System.out.println("Account with Name: '" + nameToFind + "' doesn't exist");
-								}
-
-								break;
-							}
-
-							default:{
-								if(!actionToAccount.equals("4")) {
-									System.out.println("Error");
-								}
-							}
+						if(checkUser != null){
+							kindAccount = "user";
+							break;
+						}
+						else if(checkAdmin != null){
+							kindAccount = "admin";
+							break;
 						}
 
-					}while (!Objects.equals(actionToAccount, "4"));
+					}while (true);
 
+					String password;
+
+					switch (kindAccount){
+						case "user":{
+
+							do{
+								System.out.println("Enter a password for account " + checkUser.getAccountName());
+								password = askData.nextLine();
+
+								if(Objects.equals(password, checkUser.getAccountPassword())){
+									System.out.println("\nLogin successful\n-----Welcome-----");
+								}
+								else{
+									System.out.println("Wrong password");
+								}
+
+							}while (!Objects.equals(password, checkUser.getAccountPassword()));
+
+							controller.PrintUser(checkUser);
+
+							break;
+
+						}
+						case "admin":{
+
+							do{
+								System.out.println("Enter a password for account " + checkAdmin.getAccountName());
+								password = askData.nextLine();
+
+								if(Objects.equals(password, checkAdmin.getAccountPassword())){
+									System.out.println("\nLogin successful\n-----Welcome-----");
+								}
+								else{
+									System.out.println("Wrong password");
+								}
+
+							}while (!Objects.equals(password, checkAdmin.getAccountPassword()));
+
+							controller.PrintAdmin(checkAdmin);
+
+
+
+							break;
+						}
+					}
 
 					break;
 				}
 
-				case "2":{
+				case "2": {
 					Scanner askDataForNewAccount = new Scanner(System.in);
 
 					String newName;
-					bankAccount checkName = new bankAccount();
+					UserAccount checkName = new UserAccount();
 					do {
 						System.out.print("Enter a name for new account: ");
 						newName = askDataForNewAccount.nextLine();
 
-						checkName = controller.findByAccountName(newName);
+						checkName = controller.findUserByName(newName);
 
 					}while (checkName != null);
 
@@ -112,31 +128,29 @@ public class BankSystemSpringPsqlApplication {
 					System.out.print("Enter a password for new account: ");
 					newPassword = askDataForNewAccount.nextLine();
 
-					bankAccount newAccount = new bankAccount();
-					newAccount.setAccountName(newName);
-					newAccount.setAccountPassword(newPassword);
+					UserAccount newUser = new UserAccount();
+					newUser.setAccountName(newName);
+					newUser.setAccountPassword(newPassword);
 
-					controller.createBankAccount(newAccount);
+					controller.addUser(newUser);
+
+					System.out.println("Account created successfully");
 
 					break;
-
-				}
-
-				case "3":{
-
-
-
 				}
 
 				default:{
+					if(!doAction.equals("3")){
 
+					}
+					break;
 				}
 
 			}
 
 
+		}while (!Objects.equals(doAction, "3"));
 
-		}while (!doAction.equals("4"));
 
 		context.close();
 		SpringApplication.run(BankSystemSpringPsqlApplication.class, args);

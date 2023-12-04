@@ -1,51 +1,42 @@
 package com.kostpost.banksystemspringpsql;
 
+import com.kostpost.banksystemspringpsql.bankData.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-
-import com.kostpost.banksystemspringpsql.bankData.bankAccount;
-import com.kostpost.banksystemspringpsql.bankData.bankAccountRepository;
 
 import java.util.List;
 
 @Controller
 public class MainController {
 
-    private final bankAccountRepository bankAccountRepository;
-    //private final transactionRepository transactionRepository;
 
+    private final UserAccountRepository userAccountRepository;
+    private final AdminAccountRepository adminAccountRepository;
     @Autowired
-    public MainController(bankAccountRepository bankAccountRepository){ // , transactionRepository transactionRepository){
-        this.bankAccountRepository = bankAccountRepository;
-        //this.transactionRepository = transactionRepository;
-    }
-    //--------------------------BANK ACCOUNT-------------------------------------------------
-    public bankAccount findByAccountName(String nameToFind){
-        return bankAccountRepository.findByAccountName(nameToFind);
-    }
-    public bankAccount createBankAccount(bankAccount newAccount){
-        return bankAccountRepository.save(newAccount);
-    }
-    public List<bankAccount> FindAllBankAccounts(){
-        return bankAccountRepository.findAll();
-    }
-    public bankAccount BankFindByID(int ID){
-        return bankAccountRepository.findById(ID).orElse(null);
+    public MainController(UserAccountRepository userAccountRepository, AdminAccountRepository adminAccountRepository){
+        this.userAccountRepository = userAccountRepository;
+        this.adminAccountRepository = adminAccountRepository;
     }
 
-    public void PrintBank(bankAccount bankAccount){
+
+    //--------------------------BANK ACCOUNT-------------------------------------------------
+
+
+    public void PrintUser(UserAccount printAccount){
         System.out.println("----------------------------");
-        System.out.println("ID: " + bankAccount.getAccount_id());
-        System.out.println("ID: " + bankAccount.getAccountName());
-        System.out.println("ID: " + bankAccount.getAccountPassword());
-        System.out.println("ID: " + bankAccount.getAccountBalance());
-        System.out.println("ID: " + bankAccount.getAccount_creation_date());
+        System.out.println("ID: " + printAccount.getId());
+        System.out.println("Name: " + printAccount.getAccountName());
+        System.out.println("Password: " + printAccount.getAccountPassword());
+        System.out.println("ID: " + printAccount.getAccountBalance());
+        System.out.println("ID: " + printAccount.getAccount_creation_date());
         System.out.println("----------------------------");
     }
-    public void PrintBank(List<bankAccount> bankAccounts){
+    public void PrintUser(List<UserAccount> accountsPrint){
+
         System.out.println("----------------------------");
-        for(bankAccount accPrint : bankAccounts){
-            System.out.println("ID: " + accPrint.getAccount_id());
+
+        for(UserAccount accPrint : accountsPrint){
+            System.out.println("ID: " + accPrint.getId());
             System.out.println("ID: " + accPrint.getAccountName());
             System.out.println("ID: " + accPrint.getAccountPassword());
             System.out.println("ID: " + accPrint.getAccountBalance());
@@ -54,10 +45,50 @@ public class MainController {
         }
     }
 
+    public UserAccount findUserByName(String name){
+        return userAccountRepository.findByAccountName(name);
+    }
 
-
+    public UserAccount addUser(UserAccount newUser){
+        return userAccountRepository.save(newUser);
+    }
 
     //--------------------------BANK ACCOUNT-------------------------------------------------
+
+
+
+    //--------------------------BANK ADMIN ACCOUNT-------------------------------------------------
+    public void PrintAdmin(AdminAccount printAccount){
+        System.out.println("----------------------------");
+        System.out.println("ID: " + printAccount.getId());
+        System.out.println("Name: " + printAccount.getAccountName());
+        System.out.println("Password: " + printAccount.getAccountPassword());
+        System.out.println("Level: " + printAccount.getLevel());
+        System.out.println("----------------------------");
+    }
+    public void PrintAdmin(List<AdminAccount> accountsPrint){
+
+        System.out.println("----------------------------");
+
+        for(AdminAccount accPrint : accountsPrint){
+            System.out.println("ID: " + accPrint.getId());
+            System.out.println("ID: " + accPrint.getAccountName());
+            System.out.println("ID: " + accPrint.getAccountPassword());
+            System.out.println("Level: " + accPrint.getLevel());
+            System.out.println("----------------------------");
+        }
+    }
+
+    public AdminAccount findAdminByName(String name){
+        return adminAccountRepository.findByAccountName(name);
+    }
+
+    public AdminAccount addAdmin(AdminAccount newAdminUser){
+        return adminAccountRepository.save(newAdminUser);
+    }
+
+
+    //--------------------------BANK ADMIN ACCOUNT-------------------------------------------------
 
 
 
