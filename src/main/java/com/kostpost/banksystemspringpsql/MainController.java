@@ -5,6 +5,8 @@ import com.sun.tools.javac.Main;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.security.SecurityProperties;
 import org.springframework.stereotype.Controller;
+
+import java.util.Objects;
 import java.util.Scanner;
 
 import java.util.List;
@@ -102,67 +104,121 @@ public class MainController {
 
     //--------------------------BANK ADMIN ACCOUNT ACTIONS-----------------------------------------
 
-    public void AdminPanel(AdminAccount adminAccount){
-        if(adminAccount.getLevel() >= 2){
-            Long UserByID;
-            Scanner askID = new Scanner(System.in);
-            UserAccount userAccount = null;
+    public void AdminPanel(AdminAccount adminAccount) {
 
-            do {
-                System.out.print("Enter a ID account: ");
-                UserByID = askID.nextLong();
+        Long UserByID;
+        Scanner askID = new Scanner(System.in);
+        UserAccount userAccount = null;
 
-                userAccount = findByID(UserByID);
+        String[] leve1 = new String[]{"See users", "See tran"};
+        String[] leve2 = new String[]{"See users", "See tran", "Ban accounts"};
+        String[] leve3 = new String[]{"See users", "See tran", "Change account status", "Change Admin Level"};
 
-                //PrintUser(userAccount);
-
-            }while (userAccount == null);
-
-            String[] leve1 = new String[]{"See users", "See tran"};
-            String[] leve2 = new String[]{"See users", "See tran","Ban accounts"};
-            String[] leve3 = new String[]{"See users", "See tran","Ban accounts","Change Admin Level"};
-
-            String[] availableActions;
-            if(adminAccount.getLevel() == 1)  availableActions = leve1;
-            else if(adminAccount.getLevel() == 2)  availableActions = leve2;
-            else availableActions = leve3;
+        String[] availableActions;
+        if (adminAccount.getLevel() == 1) availableActions = leve1;
+        else if (adminAccount.getLevel() == 2) availableActions = leve2;
+        else availableActions = leve3;
 
 
-            Scanner askAction = new Scanner(System.in);
-            int doAction, i;
+        Scanner askAction = new Scanner(System.in);
+        int doAction, i;
 
-            do {
-                System.out.println("----------------------------");
-                System.out.println("Choice action");
+        do {
+            System.out.println("----------------------------");
+            System.out.println("Choice action");
 
-                i = 0;
-                for (; i < availableActions.length; i++) {
-                    System.out.println(i + 1 + " - " + availableActions[i]);
-                }
-                System.out.println(i + 1 + " - Exit");
-                System.out.println("----------------------------");
+            i = 0;
+            for (; i < availableActions.length; i++) {
+                System.out.println(i + 1 + " - " + availableActions[i]);
+            }
+            System.out.println(i + 1 + " - Exit");
+            System.out.println("----------------------------");
 
-                doAction = askAction.nextInt();
-                i += 1;
+            doAction = askAction.nextInt();
+            i += 1;
 
-                switch (doAction){
 
-                    case 1:{
-                        if(adminAccount.getLevel() >= 1){
-                            PrintUser(findAllUsers());
-                        }
+
+
+            switch (doAction) {
+
+                case 1: {
+                    if (adminAccount.getLevel() >= 1) {
+                        PrintUser(findAllUsers());
                     }
-
+                    break;
                 }
 
-            } while (doAction != i);
+                case 2: {
+                    // see tran
+                    if (adminAccount.getLevel() >= 1) {
+                    }
+                    break;
+                }
+
+                case 3: {
+                    //ban
+                    if (adminAccount.getLevel() >= 2) {
+                        do {
+                            System.out.print("Enter a ID account: ");
+                            UserByID = askID.nextLong();
+
+                            userAccount = findByID(UserByID);
+
+                            //PrintUser(userAccount);
+
+                        } while (userAccount == null);
+
+                        Scanner askUserAction = new Scanner(System.in);
+                        String actionStatus = null;
+
+                        do {
+                            System.out.println("""
+                                    1 - Clear status
+                                    2 - Add status
+                                    3 - Exit""");
+
+                            actionStatus = askUserAction.nextLine();
+
+                            switch (actionStatus) {
+
+                                case "1": {
+                                    if(userAccount.getAccountStatus() != null) {
+                                        userAccount.setAccountStatus(null);
+                                    }else{
+                                        System.out.println("this account have no limits");
+                                    }
+                                    break;
+                                }
+
+                                case "2":{
+                                    System.out.println();
+                                }
+
+                            }
+
+                        }while (!Objects.equals(actionStatus, "3"));
+
+                    }
+                    break;
+                }
+
+                case 4: {
+                    //change admin level
+                    if (adminAccount.getLevel() >= 3) {
+
+                    }
+                    break;
+                }
+
+            }
+
+        } while (doAction != i);
 
 
-        }
-        else{
-            System.out.println("This action available only for admin which level above 1 ");
-        }
     }
+
+}
 
 
 
