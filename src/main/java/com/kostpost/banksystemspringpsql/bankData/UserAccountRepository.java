@@ -12,7 +12,6 @@ import java.util.List;
 
 @Repository
 public interface UserAccountRepository extends JpaRepository<UserAccount, Long> {
-    List<UserAccount> findAll();
 
     UserAccount findByAccountName(String accountName);
 

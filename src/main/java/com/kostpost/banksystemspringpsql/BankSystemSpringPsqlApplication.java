@@ -6,14 +6,12 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ConfigurableApplicationContext;
 
-import java.util.HashSet;
-import java.util.Objects;
-import java.util.Scanner;
-import java.util.Set;
+import java.util.*;
 
 import com.kostpost.banksystemspringpsql.bankData.Account;
 import com.kostpost.banksystemspringpsql.bankData.UserAccount;
 import com.kostpost.banksystemspringpsql.bankData.AdminAccount;
+import com.kostpost.banksystemspringpsql.bankData.AdminAccountRepository;
 
 @SpringBootApplication
 public class BankSystemSpringPsqlApplication {
@@ -59,6 +57,9 @@ public class BankSystemSpringPsqlApplication {
 							kindAccount = "admin";
 							break;
 						}
+						else{
+							System.out.println("Account with name '" + LogName + "' doesn't exist");
+						}
 
 					}while (true);
 
@@ -71,8 +72,11 @@ public class BankSystemSpringPsqlApplication {
 								System.out.println("Enter a password for account " + checkUser.getAccountName());
 								password = askData.nextLine();
 
-								if(Objects.equals(password, checkUser.getAccountPassword())){
+								if(Objects.equals(password, checkUser.getAccountPassword()) && checkUser.getAccountStatus() == null) {
 									System.out.println("\nLogin successful\n-----Welcome-----");
+								}
+								else if(Objects.equals(password, checkUser.getAccountPassword()) && checkUser.getAccountStatus() != null) {
+									System.out.println("Your account was banned");
 								}
 								else{
 									System.out.println("Wrong password");
@@ -93,16 +97,15 @@ public class BankSystemSpringPsqlApplication {
 
 								if(Objects.equals(password, checkAdmin.getAccountPassword())){
 									System.out.println("\nLogin successful\n-----Welcome-----");
+									controller.PrintAdmin(checkAdmin);
+									controller.AdminPanel(checkAdmin);
+									break;
 								}
 								else{
 									System.out.println("Wrong password");
 								}
 
 							}while (!Objects.equals(password, checkAdmin.getAccountPassword()));
-
-							controller.PrintAdmin(checkAdmin);
-
-
 
 							break;
 						}

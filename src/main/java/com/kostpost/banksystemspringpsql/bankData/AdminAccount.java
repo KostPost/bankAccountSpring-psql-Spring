@@ -19,11 +19,6 @@ public class AdminAccount extends Account {
     @Column(name = "admin_level")
     private long level;
 
-//    private Set<Set<String>> qwe(){
-//        Set<String> zxc = new HashSet<>();
-//        zxc.add("qwe");
-//
-//        qwe().add(zxc);
-//    }
+
 
 }
