@@ -6,7 +6,6 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import com.kostpost.banksystemspringpsql.bankData.UserAccount;
 
 @SpringBootApplication
 @Getter
@@ -42,12 +41,12 @@ public class Transaction {
     private double recipientBalanceAfterTransaction;
 
     @Column(name = "account_creation_date")
-    private LocalDate transactionData = null;
+    private LocalDate transactionDate = null;
 
     public Transaction() {
 
 
-        transactionData = LocalDate.now();
+        transactionDate = LocalDate.now();
 
 
     }

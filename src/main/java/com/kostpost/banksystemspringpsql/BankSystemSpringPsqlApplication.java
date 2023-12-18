@@ -98,7 +98,7 @@ public class BankSystemSpringPsqlApplication {
                                         break;
                                     }
                                     case "2": {
-
+                                        controller.print(controller.findAllUserTransaction(currentUser.getAccountName()), currentUser.getAccountName());
                                         break;
                                     }
                                     case "3": {

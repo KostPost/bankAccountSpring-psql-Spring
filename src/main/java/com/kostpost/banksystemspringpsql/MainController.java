@@ -7,11 +7,7 @@ import com.kostpost.banksystemspringpsql.repositories.TransactionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Scanner;
-
-import java.util.List;
+import java.util.*;
 
 @Controller
 public class MainController {
@@ -99,7 +95,6 @@ public class MainController {
 
             moneyTransfer(sender,recipient,transactionSum);
 
-
             sender = findByID(senderID);
             recipient = findByID(recipientID);
 
@@ -127,7 +122,51 @@ public class MainController {
     public void addTransaction(Transaction transaction) {
         transactionRepository.save(transaction);
     }
+    public ArrayList<Transaction> findAllUserTransaction(String user){
+        return transactionRepository.findTransactionsByUserAsBothSenderAndRecipient(user);
+    }
 
+    public void print(ArrayList<Transaction> transactions, String user){
+        System.out.println("----------------------------------------------------");
+        for(Transaction transaction : transactions){
+            System.out.println("Transaction ID: " + transaction.getTransactionID());
+            System.out.println("Transaction sum: " + transaction.getTransactionSum());
+            System.out.println("Sender: " + transaction.getSender());
+            System.out.println("Recipient: " + transaction.getRecipient());
+
+            if(Objects.equals(transaction.getSender(), user)){
+                System.out.println("Sender balance before transaction: " + transaction.getSenderBalanceBeforeTransaction());
+                System.out.println("Sender balance after transaction: " + transaction.getSenderBalanceAfterTransaction());
+            } else{
+                System.out.println("Recipient balance before transaction: " + transaction.getRecipientBalanceBeforeTransaction());
+                System.out.println("Recipient balance after transaction: " + transaction.getRecipientBalanceAfterTransaction());
+            }
+
+            System.out.println("Transaction date: " + transaction.getTransactionDate());
+            System.out.println("----------------------------------------------------");
+
+        }
+
+    }
+    public void print(Transaction transaction, String user){
+        System.out.println("----------------------------------------------------");
+        System.out.println("Transaction ID: " + transaction.getTransactionID());
+        System.out.println("Transaction sum: " + transaction.getTransactionSum());
+        System.out.println("Sender: " + transaction.getSender());
+        System.out.println("Recipient: " + transaction.getRecipient());;
+
+        if(Objects.equals(transaction.getSender(), user)){
+            System.out.println("Sender balance before transaction: " + transaction.getSenderBalanceBeforeTransaction());
+            System.out.println("Sender balance after transaction: " + transaction.getSenderBalanceAfterTransaction());
+        } else{
+            System.out.println("Recipient balance before transaction: " + transaction.getRecipientBalanceBeforeTransaction());
+            System.out.println("Recipient balance after transaction: " + transaction.getRecipientBalanceAfterTransaction());
+        }
+
+        System.out.println("Transaction date: " + transaction.getTransactionDate());
+        System.out.println("----------------------------------------------------");
+
+    }
     //--------------------------TRANSACTION-------------------------------------------------
 
 
