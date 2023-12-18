@@ -1,12 +1,14 @@
 package com.kostpost.banksystemspringpsql;
 
 import com.kostpost.banksystemspringpsql.bankData.*;
-import com.sun.tools.javac.Main;
+import com.kostpost.banksystemspringpsql.repositories.AdminAccountRepository;
+import com.kostpost.banksystemspringpsql.repositories.UserAccountRepository;
+import com.kostpost.banksystemspringpsql.repositories.TransactionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.security.SecurityProperties;
 import org.springframework.stereotype.Controller;
 
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Scanner;
 
 import java.util.List;
@@ -17,17 +19,20 @@ public class MainController {
 
     private final UserAccountRepository userAccountRepository;
     private final AdminAccountRepository adminAccountRepository;
+    private final TransactionRepository transactionRepository;
     @Autowired
-    public MainController(UserAccountRepository userAccountRepository, AdminAccountRepository adminAccountRepository){
+    public MainController(UserAccountRepository userAccountRepository, AdminAccountRepository adminAccountRepository
+                          , TransactionRepository transactionRepository) {
         this.userAccountRepository = userAccountRepository;
         this.adminAccountRepository = adminAccountRepository;
+        this.transactionRepository = transactionRepository;
+
     }
 
 
     //--------------------------BANK ACCOUNT-------------------------------------------------
 
-
-    public void PrintUser(UserAccount printAccount){
+    public void PrintUser(UserAccount printAccount) {
         System.out.println("----------------------------");
         System.out.println("ID: " + printAccount.getId());
         System.out.println("Name: " + printAccount.getAccountName());
@@ -36,11 +41,12 @@ public class MainController {
         System.out.println("Creating Date: " + printAccount.getAccount_creation_date());
         System.out.println("----------------------------");
     }
-    public void PrintUser(List<UserAccount> accountsPrint){
+
+    public void PrintUser(List<UserAccount> accountsPrint) {
 
         System.out.println("----------------------------");
 
-        for(UserAccount accPrint : accountsPrint){
+        for (UserAccount accPrint : accountsPrint) {
             System.out.println("ID: " + accPrint.getId());
             System.out.println("Name: " + accPrint.getAccountName());
             System.out.println("Password: " + accPrint.getAccountPassword());
@@ -50,28 +56,86 @@ public class MainController {
         }
     }
 
-    public UserAccount findUserByName(String name){
+    public UserAccount findByCardNumber(String number){
+        return userAccountRepository.findByCardNumber(number);
+    }
+    public UserAccount findUserByName(String name) {
         return userAccountRepository.findByAccountName(name);
     }
 
-    public UserAccount findByID(Long ID){
+    public UserAccount findByID(Long ID) {
         return userAccountRepository.findById(ID).orElse(null);
     }
 
-    public List<UserAccount> findAllUsers(){
+    public List<UserAccount> findAllUsers() {
         return userAccountRepository.findAll();
     }
 
-    public UserAccount addUser(UserAccount newUser){
-        return userAccountRepository.save(newUser);
+    public void addUser(UserAccount newUser) {
+        userAccountRepository.save(newUser);
     }
 
+
     //--------------------------BANK ACCOUNT-------------------------------------------------
+
+    //--------------------------TRANSACTION-------------------------------------------------
+    public void createTransfer(UserAccount sender, UserAccount recipient, double transactionSum){
+
+        if(transactionSum < sender.getAccountBalance()) {
+
+            Long senderID = sender.getId(), recipientID = recipient.getId();
+
+            Transaction newTransaction = new Transaction();
+
+            newTransaction.setTransactionSum(transactionSum);
+
+            newTransaction.setSender(sender.getAccountName());
+            newTransaction.setSenderID(sender.getId());
+            newTransaction.setSenderBalanceBeforeTransaction(sender.getAccountBalance());
+
+            newTransaction.setRecipient(recipient.getAccountName());
+            newTransaction.setRecipientID(recipient.getId());
+            newTransaction.setRecipientBalanceBeforeTransaction(recipient.getAccountBalance());
+
+            moneyTransfer(sender,recipient,transactionSum);
+
+
+            sender = findByID(senderID);
+            recipient = findByID(recipientID);
+
+            newTransaction.setSenderBalanceAfterTransaction(sender.getAccountBalance());
+            newTransaction.setRecipientBalanceAfterTransaction(recipient.getAccountBalance());
+
+            addTransaction(newTransaction);
+
+
+        }
+        else{
+            System.out.println("Insufficient funds for the money transfer\n" +
+                    "Transaction sum: " + transactionSum + ", Your balance: " + sender.getAccountBalance());
+        }
+    }
+    private void moneyTransfer(UserAccount sender, UserAccount recipient, double transactionSum) {
+
+        sender.setAccountBalance(sender.getAccountBalance() - transactionSum);
+        userAccountRepository.save(sender);
+
+        recipient.setAccountBalance(recipient.getAccountBalance() + transactionSum);
+        userAccountRepository.save(recipient);
+    }
+
+    public void addTransaction(Transaction transaction) {
+        transactionRepository.save(transaction);
+    }
+
+    //--------------------------TRANSACTION-------------------------------------------------
+
+
 
 
 
     //--------------------------BANK ADMIN ACCOUNT-------------------------------------------------
-    public void PrintAdmin(AdminAccount printAccount){
+    public void PrintAdmin(AdminAccount printAccount) {
         System.out.println("----------------------------");
         System.out.println("ID: " + printAccount.getId());
         System.out.println("Name: " + printAccount.getAccountName());
@@ -79,11 +143,12 @@ public class MainController {
         System.out.println("Level: " + printAccount.getLevel());
         System.out.println("----------------------------");
     }
-    public void PrintAdmin(List<AdminAccount> accountsPrint){
+
+    public void PrintAdmin(List<AdminAccount> accountsPrint) {
 
         System.out.println("----------------------------");
 
-        for(AdminAccount accPrint : accountsPrint){
+        for (AdminAccount accPrint : accountsPrint) {
             System.out.println("ID: " + accPrint.getId());
             System.out.println("ID: " + accPrint.getAccountName());
             System.out.println("ID: " + accPrint.getAccountPassword());
@@ -92,11 +157,11 @@ public class MainController {
         }
     }
 
-    public AdminAccount findAdminByName(String name){
+    public AdminAccount findAdminByName(String name) {
         return adminAccountRepository.findByAccountName(name);
     }
 
-    public AdminAccount addAdmin(AdminAccount newAdminUser){
+    public AdminAccount addAdmin(AdminAccount newAdminUser) {
         return adminAccountRepository.save(newAdminUser);
     }
 
@@ -136,8 +201,6 @@ public class MainController {
 
             doAction = askAction.nextInt();
             i += 1;
-
-
 
 
             switch (doAction) {
@@ -183,21 +246,21 @@ public class MainController {
                             switch (actionStatus) {
 
                                 case "1": {
-                                    if(userAccount.getAccountStatus() != null) {
+                                    if (userAccount.getAccountStatus() != null) {
                                         userAccount.setAccountStatus(null);
-                                    }else{
+                                    } else {
                                         System.out.println("this account have no limits");
                                     }
                                     break;
                                 }
 
-                                case "2":{
+                                case "2": {
                                     System.out.println();
                                 }
 
                             }
 
-                        }while (!Objects.equals(actionStatus, "3"));
+                        } while (!Objects.equals(actionStatus, "3"));
 
                     }
                     break;
@@ -221,11 +284,10 @@ public class MainController {
 }
 
 
-
-    //--------------------------BANK ADMIN ACCOUNT ACTIONS-----------------------------------------
-
+//--------------------------BANK ADMIN ACCOUNT ACTIONS-----------------------------------------
 
 
 
 
-}
+
+
